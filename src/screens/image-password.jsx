@@ -13,7 +13,7 @@ export default function Imagepassword() {
   const [numClicks, setNumClicks] = useState(0);
   const [imageStack, setImageStack] = useState([]);
   const [selectedNumbers,setSelectedNumbers] = useState([]);
-  const [array, setArray] = useState([...Array(16)].map((_, index) => index));
+  const [array, setArray] = useState([...Array(25)].map((_, index) => index));
   const [timer,setTimer] = useState(0);
   const [text,setText] = useState("");
   // const [doSuffle,setDoSuffle] = useState(false)
@@ -30,7 +30,7 @@ export default function Imagepassword() {
 
     const initCheck =async ()=>{
       try{
-        const docRef = doc(db, "celeb_grphical_password",localStorage.getItem("name"));
+        const docRef = doc(db, "celeb_graphical_password",localStorage.getItem("name"));
         const docSnap = await getDoc(docRef);
        if (docSnap.exists()){
         setText("Confirm")
@@ -112,7 +112,7 @@ initCheck()
   };
 
   const handleConfirmClick = async ()=>{
-    const docRef = doc(db, "celeb_grphical_password",localStorage.getItem("name"));
+    const docRef = doc(db, "celeb_graphical_password",localStorage.getItem("name"));
     const docSnap = await getDoc(docRef);
    if (docSnap.exists()){
   //  console.log(docSnap.data())
@@ -127,7 +127,7 @@ initCheck()
   //  }
 
    if(docSnap.data().setup.toString()===selectedNumbers.toString()){
-    await setDoc(doc(db, "celeb_grphical_password",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
+    await setDoc(doc(db, "celeb_graphical_password",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
       time: new Date(),
       setup:docSnap.data().setup,
       recall:selectedNumbers ,
@@ -144,7 +144,7 @@ initCheck()
        incorrect.push(docSnap.data().setup[index])
       } 
     });
-    await setDoc(doc(db, "celeb_grphical_password",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
+    await setDoc(doc(db, "celeb_graphical_password",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
       time: new Date(),
       setup:docSnap.data().setup,
       recall:selectedNumbers ,
@@ -159,7 +159,7 @@ initCheck()
    }
    else{
    
-    await setDoc(doc(db, "celeb_grphical_password",localStorage.getItem("name")), {
+    await setDoc(doc(db, "celeb_graphical_password",localStorage.getItem("name")), {
       time:new Date(),
       name: localStorage.getItem("name"),
       setup:selectedNumbers   ,
