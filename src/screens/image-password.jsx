@@ -35,7 +35,7 @@ export default function Imagepassword() {
         const docRef = doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"));
         const docSnap = await getDoc(docRef);
        if (docSnap.exists()){
-        setText("Confirm Passfaces")
+        setText("Done")
         
        
         // setDoSuffle(true)
@@ -43,7 +43,7 @@ export default function Imagepassword() {
        
         // setDoSuffle(false)
 
-        setText("Confirm Passfaces")
+        setText("Done")
        }
       }
       catch(er){
@@ -61,6 +61,35 @@ initCheck()
       setTimer(timer+1)
      }, 1000);
   },[timer])
+
+  const checkLogin = async() => {    const docRef = doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"));
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()){
+        // console.log(docSnap.data())
+        const attemptsCollectionRef = collection(db, "celeb_graphical_password_4x8_final_1", localStorage.getItem("name"), "attempts");
+        const attemptsSnapshot = await getDocs(attemptsCollectionRef);
+      
+        const numberOfAttempts = attemptsSnapshot.size;
+        console.log(numberOfAttempts);
+        if(numberOfAttempts>=12){
+          toast.error("You have exhausted all recall attempts")
+          return
+        }
+        var querySnapshot = await getDoc(doc(db, "celeb_graphical_password_4x8_final_1", localStorage.getItem("name")));
+        // find the timestamp from this querySnapshot
+        var timeStamp = querySnapshot.data().timestamp;
+        var time_diff_minutes = Math.floor(((new Date() - Date.parse(timeStamp))/1000)/60);
+        if(numberOfAttempts>=8){
+          if(time_diff_minutes<10){
+            toast.error(`You need to wait for ${10-time_diff_minutes} minute(s) before trying again`)
+            return
+          }
+        }
+
+      }
+      shuffleArray();
+
+  }
 
   const handleImageClick = (image,index, position) => {
     if (numClicks < 6) {
@@ -134,7 +163,7 @@ if(true){
 
    if(docSnap.data().setup.toString()===selectedNumbers.toString()){
     await setDoc(doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
-      ttimestamp: new Date().toString(),
+      timestamp: new Date().toString(),
       setup:docSnap.data().setup,
       recall:selectedNumbers ,
       positions: selectedPositions,
@@ -189,7 +218,7 @@ if(true){
           )}
           {imageStack.length >= 0 && numShuffles<1 && (
            
-           <FontAwesomeIcon className="btnS" onClick={shuffleArray} icon={faCirclePlay}/>
+           <FontAwesomeIcon className="btnS" onClick={checkLogin} icon={faCirclePlay}/>
              
             )}
   
@@ -201,7 +230,7 @@ if(true){
           </button>
         )}
          {imageStack.length !== 6 && numShuffles > 0 &&(
-           <p className="inner__text">Pick a Face</p>)
+           <p className="inner__text">Set Passfaces</p>)
          }
   
         {imageStack.length !== 6 && numShuffles === 0 &&(
