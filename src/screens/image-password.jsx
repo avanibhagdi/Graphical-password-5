@@ -20,7 +20,7 @@ export default function Imagepassword() {
   const [text,setText] = useState("");
   // const [doSuffle,setDoSuffle] = useState(false)
   const navigate = useNavigate();
-
+  const pilot_users = ["pilot1", "pilot2", "pilot3", "pilot4", "pilot5", "pilot6", "pilot7", "pilot8", "pilot9", "pilot10", "pilot11", "pilot12", "pilot13"];
 
   useEffect(() => {
  
@@ -32,7 +32,7 @@ export default function Imagepassword() {
 
     const initCheck =async ()=>{
       try{
-        const docRef = doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"));
+        const docRef = doc(db, "celeb_graphical_password_4x8_final_2",localStorage.getItem("name"));
         const docSnap = await getDoc(docRef);
        if (docSnap.exists()){
         setText("Done")
@@ -62,11 +62,11 @@ initCheck()
      }, 1000);
   },[timer])
 
-  const checkLogin = async() => {    const docRef = doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"));
+  const checkLogin = async() => {    const docRef = doc(db, "celeb_graphical_password_4x8_final_2",localStorage.getItem("name"));
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()){
         // console.log(docSnap.data())
-        const attemptsCollectionRef = collection(db, "celeb_graphical_password_4x8_final_1", localStorage.getItem("name"), "attempts");
+        const attemptsCollectionRef = collection(db, "celeb_graphical_password_4x8_final_2", localStorage.getItem("name"), "attempts");
         const attemptsSnapshot = await getDocs(attemptsCollectionRef);
       
         const numberOfAttempts = attemptsSnapshot.size;
@@ -75,7 +75,7 @@ initCheck()
           toast.error("You have exhausted all recall attempts")
           return
         }
-        var querySnapshot = await getDoc(doc(db, "celeb_graphical_password_4x8_final_1", localStorage.getItem("name")));
+        var querySnapshot = await getDoc(doc(db, "celeb_graphical_password_4x8_final_2", localStorage.getItem("name")));
         // find the timestamp from this querySnapshot
         var timeStamp = querySnapshot.data().timestamp;
         var time_diff_minutes = Math.floor(((new Date() - Date.parse(timeStamp))/1000)/60);
@@ -89,6 +89,88 @@ initCheck()
       }
       shuffleArray();
 
+  }
+
+   const checkURL = async() => {
+      var uname = localStorage.getItem("name");
+      const numid = parseInt(uname);
+      if((isNaN(numid) || numid<1 || numid>50) && (!pilot_users.includes(uname))){
+        toast.error("Invalid User");
+        return;
+      }
+      const docRef = doc(db, "celeb_graphical_password_4x8_final_2",localStorage.getItem("name"));
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()){
+        // console.log(docSnap.data())
+        const attemptsCollectionRef = collection(db, "celeb_graphical_password_4x8_final_2", localStorage.getItem("name"), "attempts");
+        const attemptsSnapshot = await getDocs(attemptsCollectionRef);
+        const numberOfAttempts = attemptsSnapshot.size;
+        const subdoc = await getDocs(
+          collection(db, "celeb_graphical_password_4x8_final_2/" + docSnap.id + "/attempts")
+        );
+  
+        var last_recall = 0;
+        var last_correct_recall = 0;
+        var last_attempt_rec = 0;
+        var last_status = -1;
+        subdoc.forEach((dat) => {
+          console.log(dat.data().status);
+          if (dat.data().status == true){
+            last_status = 1;
+            last_correct_recall = Number(dat.data().recall);
+          }
+          else{
+            last_status = 0;
+          }
+          last_recall = Number(dat.data().recall);
+          last_attempt_rec = Number(dat.data().attempt);
+        });
+  
+        const link_recall = Number(localStorage.getItem("recall"));
+        const link_attempt_rec = Number(localStorage.getItem("attempt"));
+        if(last_status == -1){
+          if(!((link_recall === 1) && (link_attempt_rec === 1))){
+            toast.error("Invalid Session");
+            return;
+          }
+        }
+        else{
+          if(last_correct_recall === last_recall){
+            if(!(((link_recall === last_recall + 1) && (link_attempt_rec === 1)) || ((link_recall === last_recall) && (link_attempt_rec === last_attempt_rec + 1)))){
+              toast.error("Invalid Session");
+              return;
+            }
+          }
+          else{
+            if(last_attempt_rec === 4){
+              if(!((link_recall === last_recall + 1) && (link_attempt_rec === 1))){
+                toast.error("Invalid Session");
+                return;
+              }
+            }
+            else{
+              if(!((link_recall === last_recall ) && (link_attempt_rec === last_attempt_rec + 1))){
+                toast.error("Invalid Session");
+                return;
+              }
+            }
+          }
+        }
+        if(link_recall > 3 || link_attempt_rec > 4 || link_attempt_rec < 1 || link_recall < 1){
+          toast.error("Invalid Link");
+          return;
+        }
+        console.log(last_correct_recall)
+        console.log(last_recall)
+        console.log(last_attempt_rec);
+      }
+      else{
+        if(Number(localStorage.getItem("recall"))!==0){
+          toast.error("Invalid session")
+          return
+        }
+      }
+      shuffleArray();
   }
 
   const handleImageClick = (image,index, position) => {
@@ -147,7 +229,7 @@ if(true){
   };
 
   const handleConfirmClick = async ()=>{
-    const docRef = doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"));
+    const docRef = doc(db, "celeb_graphical_password_4x8_final_2",localStorage.getItem("name"));
     const docSnap = await getDoc(docRef);
    if (docSnap.exists()){
   //  console.log(docSnap.data())
@@ -162,14 +244,16 @@ if(true){
   //  }
 
    if(docSnap.data().setup.toString()===selectedNumbers.toString()){
-    await setDoc(doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
+    await setDoc(doc(db, "celeb_graphical_password_4x8_final_2",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
       timestamp: new Date().toString(),
       setup:docSnap.data().setup,
       recall:selectedNumbers ,
       positions: selectedPositions,
       incorrect:"",
       status:true   ,
-      time_taken:timer
+      time_taken:timer,
+      recall:localStorage.getItem("recall"),
+      attempt: localStorage.getItem("attempt")
 
     });
     navigate("/verified");
@@ -180,7 +264,7 @@ if(true){
        incorrect.push(docSnap.data().setup[index])
       } 
     });
-    await setDoc(doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
+    await setDoc(doc(db, "celeb_graphical_password_4x8_final_2",localStorage.getItem("name"),"attempts",`recall-${Date.now()}`), {
       timestamp: new Date().toString(),
       setup:docSnap.data().setup,
       recall:selectedNumbers ,
@@ -188,6 +272,8 @@ if(true){
       status:false  ,
       incorrect:incorrect,
       time_taken:timer,
+      recall:localStorage.getItem("recall"),
+      attempt: localStorage.getItem("attempt"),
 
 
     });
@@ -196,7 +282,7 @@ if(true){
    }
    else{
    
-    await setDoc(doc(db, "celeb_graphical_password_4x8_final_1",localStorage.getItem("name")), {
+    await setDoc(doc(db, "celeb_graphical_password_4x8_final_2",localStorage.getItem("name")), {
       timestamp: new Date().toString(),
       name: localStorage.getItem("name"),
       setup:selectedNumbers   ,
@@ -218,7 +304,7 @@ if(true){
           )}
           {imageStack.length >= 0 && numShuffles<1 && (
            
-           <FontAwesomeIcon className="btnS" onClick={checkLogin} icon={faCirclePlay}/>
+           <FontAwesomeIcon className="btnS" onClick={checkURL} icon={faCirclePlay}/>
              
             )}
   
@@ -244,7 +330,7 @@ if(true){
             {selectedImages.map((image, index) => (
               <div key={index} className="inner__circle">
              {
-            index+1 !== selectedImages.length ?<div className="div__askterisk">*</div> :<img src={image} key={index} />
+            <img src={image} key={index} />
            }
               </div>
             ))}
