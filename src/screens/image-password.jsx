@@ -178,6 +178,9 @@ initCheck()
       if(numClicks+1!==6){
         shuffleArray()
       }
+      else{
+        window.scrollTo(9,0);
+      }
       setSelectedImages([...selectedImages, image]);
       setImageStack([...imageStack, image]);
       setSelectedNumbers([...selectedNumbers,index])
@@ -316,8 +319,26 @@ if(true){
           </button>
         )}
          {imageStack.length !== 6 && numShuffles > 0 &&(
-           <p className="inner__text">Set Passfaces</p>)
+           <p className="inner__text">Pick a Face</p>)
          }
+         {imageStack.length !== 6 && numShuffles > 0 && numClicks===0&&(
+         <p className="inner__text2">Male Politicians / Public Figures</p>)
+       }
+       {imageStack.length !== 6 && numShuffles > 0 && numClicks===1&&(
+         <p className="inner__text2">Female Politicians / Public Figures</p>)
+       }
+       {imageStack.length !== 6 && numShuffles > 0 && numClicks===2&&(
+         <p className="inner__text2">Male Actors</p>)
+       }
+       {imageStack.length !== 6 && numShuffles > 0 && numClicks===3&&(
+         <p className="inner__text2">Female Actresses</p>)
+       }
+       {imageStack.length !== 6 && numShuffles > 0 && numClicks===4&&(
+         <p className="inner__text2">Sports</p>)
+       }
+       {imageStack.length !== 6 && numShuffles > 0 && numClicks===5&&(
+         <p className="inner__text2">Music</p>)
+       }
   
         {imageStack.length !== 6 && numShuffles === 0 &&(
            <p className="inner__text1">Press Play to Start</p>)
